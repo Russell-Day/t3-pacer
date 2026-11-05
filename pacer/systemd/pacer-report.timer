@@ -1,0 +1,9 @@
+[Unit]
+Description=Check every 15 minutes whether the pacer morning report is due
+
+[Timer]
+OnCalendar=*:0/15
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,6 @@
+[Unit]
+Description=Pacer morning report (posts once a day at or after reportAt)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env node %h/.agents/skills/pacer/scripts/pacer.mjs report --since 10h --post --morning

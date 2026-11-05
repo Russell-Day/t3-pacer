@@ -1,0 +1,6 @@
+[Unit]
+Description=Pacer tick: pace main Claude threads in T3 Code against the usage window
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env node %h/.agents/skills/pacer/scripts/pacer.mjs tick

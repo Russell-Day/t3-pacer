@@ -1,0 +1,58 @@
+{
+  "_doc": {
+    "where": "Copy to ~/.local/state/pacer/config.json (or $PACER_STATE_DIR/config.json). Every key is optional; the values below are the defaults or examples. Keys starting with _ are ignored.",
+    "timeZone": "IANA zone for the user's day (night window, asleep noon cap, labels, reportAt). Default: the system zone.",
+    "night": "A Session window whose reset falls between resetFrom and resetTo (local, both ends included, may wrap midnight) is a night window.",
+    "dayFinishMin": "A day window's pace line reaches 100% this many minutes before the reset.",
+    "nightFinishMin": "A night window's pace line reaches 100% this many minutes before the reset.",
+    "priorityWeights": "Queue score W per priority: score = W x (1 + days waiting / ageDays) x (paused ? pausedFactor : 1).",
+    "ageDays": "Days of waiting that double a queued entry's score.",
+    "pausedFactor": "Multiplier for paused (started) work, so it resumes before fresh work of its level.",
+    "nearTie": "Within this share of the best score, size breaks the tie (l at night, s by day).",
+    "handoffCompactions": "A lead at this many T3 compactions hands off to a fresh thread.",
+    "maxWorking": "Working-model threads (workers included) before wakes need pace - tol. The cap never pauses.",
+    "workingModels": "Case-insensitive patterns matched against a Claude thread's model id; matches count toward maxWorking.",
+    "reportAt": "Local time the morning report goes out (report --morning).",
+    "reportCommand": "Shell command that receives the morning report and the wake digest as markdown on stdin (your notifier). Unset: no post.",
+    "sleepFile": "Optional JSON file (absolute path) another app writes: {day, bedtime_at, night_until, wake_at, updated_at}, UTC ISO times. The pacer only reads it.",
+    "questions": "Optional open-questions hook: {file} (JSON, absolute path) or {command} (prints JSON) mapping thread id to [{id, question, at}]. Remove the key for none.",
+    "triage": "Optional triage hook: once per window checkCommand prints a count of new items; N > 0 starts a triage thread in project. {items} = 'N new items', {count} = N.",
+    "emergency": "Optional emergency hook: checkCommand prints {causes: [...]}; textCommand gets '<line> --key <key>' as arguments; postCommand gets the line on stdin; chain lists T3 model selections tried in order.",
+    "t3": "userdata: T3's data dir. claudeInstance: the T3 provider instance whose usage and threads are paced. mainInstance: where new threads start (default claudeInstance).",
+    "claude": "configDir: the Claude config dir behind claudeInstance (for the login notice). providerLogs: read live usage from T3's provider logs (default true; T3's own probe can go stale). The logs don't say which account wrote them, so set false if T3 runs more than one Claude account."
+  },
+  "night": { "resetFrom": "00:00", "resetTo": "10:00" },
+  "dayFinishMin": 10,
+  "nightFinishMin": 30,
+  "priorityWeights": { "highest": 8, "high": 4, "med": 2, "low": 1 },
+  "ageDays": 7,
+  "pausedFactor": 1.5,
+  "nearTie": 0.8,
+  "handoffCompactions": 3,
+  "maxWorking": 6,
+  "workingModels": ["opus"],
+  "reportAt": "07:00",
+  "reportCommand": "my-notifier post --channel pacer",
+  "sleepFile": "/path/to/sleep.json",
+  "questions": { "file": "/path/to/open-questions.json" },
+  "triage": {
+    "project": "/path/to/your/repo",
+    "checkCommand": "my-triage-command count",
+    "title": "Triage: {items}",
+    "message": "Triage the {items}.",
+    "minItems": 5,
+    "everyHours": 24
+  },
+  "emergency": {
+    "project": "/path/to/your/repo",
+    "checkCommand": "my-health-check --json",
+    "textCommand": "my-notifier text",
+    "postCommand": "my-notifier post --channel health",
+    "cooldownHours": 6,
+    "chain": [
+      { "instance": "claudeAgent", "model": "claude-opus-5-5", "options": [{ "id": "effort", "value": "high" }] }
+    ]
+  },
+  "t3": { "userdata": "~/.t3/userdata", "claudeInstance": "claudeAgent", "mainInstance": "claudeAgent" },
+  "claude": { "configDir": "~/.claude", "providerLogs": true }
+}
